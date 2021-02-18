@@ -1,6 +1,6 @@
 #include "UIManager.h"
 
-UIManager::UIManager(std::shared_ptr<Player>& player) : player{ player } {
+UIManager::UIManager(std::unique_ptr<Player>& player) : player{ player } {
 	window.create(sf::VideoMode::getFullscreenModes()[0], "AA Gunner", sf::Style::Fullscreen);
 	texture.create(window.getSize().x, window.getSize().y);
 	window.setFramerateLimit(120);
@@ -10,7 +10,7 @@ UIManager::UIManager(std::shared_ptr<Player>& player) : player{ player } {
 	}
 }
 
-UIManager::UIManager(unsigned int x, unsigned int y, std::shared_ptr<Player>& player) : player{ player } {
+UIManager::UIManager(unsigned int x, unsigned int y, std::unique_ptr<Player>& player) : player{ player } {
 	window.create(sf::VideoMode{ x, y }, "AA Gunner", sf::Style::Close);
 	texture.create(window.getSize().x, window.getSize().y);
 	window.setFramerateLimit(120);

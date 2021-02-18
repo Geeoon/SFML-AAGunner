@@ -4,6 +4,11 @@ ParticleSystem::ParticleSystem(size_t count, float range, float angle, sf::Color
 
 }
 
+
+ParticleSystem::~ParticleSystem() {
+	particles.clear();
+}
+
 void ParticleSystem::setPosition(sf::Vector2f p) {
 	position = p;
 }
@@ -16,7 +21,7 @@ void ParticleSystem::update(sf::Time elapsed) {
 	for (size_t i = 0; i < particles.size(); i++) {
 		auto& p = particles[i];
 		p.lifetime -= elapsed;
-		p.velocity += acceleration;
+		p.velocity += acceleration * elapsed.asSeconds();
 
 		if (p.lifetime <= sf::Time::Zero) {
 			resetParticle(i);
@@ -29,6 +34,9 @@ void ParticleSystem::update(sf::Time elapsed) {
 	}
 }
 
+bool ParticleSystem::getIsDone() {
+	return false;
+}
 void ParticleSystem::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;

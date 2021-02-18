@@ -1,12 +1,15 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 class ParticleSystem : public sf::Drawable, public sf::Transformable {
 public:
 	ParticleSystem(size_t count, float range, float angle, sf::Color color, float life, float speed);
+	~ParticleSystem();
 	void setPosition(sf::Vector2f p);
 	void setAcceleration(sf::Vector2f a);
 	virtual void update(sf::Time elapsed);
+	virtual bool getIsDone();
 
 protected:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

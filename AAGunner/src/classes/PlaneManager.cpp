@@ -1,6 +1,6 @@
 #include "PlaneManager.h"
 
-PlaneManager::PlaneManager(size_t num, const sf::RenderTexture& t) : planes{ num }, xBound{ static_cast<int>(t.getSize().x) }, yBound{ static_cast<int>(t.getSize().y) } {
+PlaneManager::PlaneManager(size_t num, std::unique_ptr<Player>& player, const sf::RenderTexture& t) : planes{ num }, player{ player }, xBound{ static_cast<int>(t.getSize().x) }, yBound{ static_cast<int>(t.getSize().y) } {
 	srand(static_cast<unsigned int>(time(0)));
 	for (size_t i = 0; i < planes.size(); i++) {
 		auto x = static_cast<float>(std::rand() % xBound);
@@ -16,8 +16,9 @@ PlaneManager::PlaneManager(size_t num, const sf::RenderTexture& t) : planes{ num
 }
 
 void PlaneManager::update() {
+	double deltaT = static_cast<double>(clock.getElapsedTime().asSeconds());
+	clock.restart();
 	for (size_t i = 0; i < planes.size(); i++) {
-		double deltaT = clock.getElapsedTime().asSeconds();
 		if (deltaT > 0.1) {
 			deltaT = 0.1;
 		}
@@ -26,7 +27,14 @@ void PlaneManager::update() {
 			planes[i]->reflect();
 		}
 	}
-	clock.restart();
+
+	for (auto& bullet : player->getBullets()) {
+		for (auto& plane : planes) {
+			if (abs(plane->getX() - bullet->getX()) <= 10.0f && abs(plane->getY() - bullet->getY()) <= 10.0f) {
+				std::cout << "it worked";
+			}
+		}
+	}
 }
 
 sf::Sprite PlaneManager::getSprite() {

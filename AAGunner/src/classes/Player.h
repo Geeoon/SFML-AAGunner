@@ -10,12 +10,18 @@ public:
 	void draw();
 	void update(const sf::RenderWindow& w);
 	void fire();
+	int getScore();
+	void giveScore(int s);
+	std::vector<std::unique_ptr<Bullet>>& getBullets();
+
 private:
-	std::vector<ParticleExploder> particleSystems;
-	std::vector<std::shared_ptr<Bullet>> bullets;
+	std::vector<std::unique_ptr<ParticleSystem>> particleSystems;
+	std::vector<std::unique_ptr<Bullet>> bullets;
 	sf::Clock clock;
 	sf::RenderTexture& texture;
 	sf::RectangleShape base, cannon;
-	int x, y;
+	int x, y, score;
+	float firingTime;
 	double angle;
+	const float fireRate;
 };

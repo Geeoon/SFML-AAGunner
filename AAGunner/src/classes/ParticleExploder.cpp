@@ -1,13 +1,13 @@
 #include "ParticleExploder.h"
 
-ParticleExploder::ParticleExploder(size_t count, float range, float angle, sf::Color color, float life, float speed, sf::Vector2f pos) : ParticleSystem{ count, range, angle, color, life, speed } {
+ParticleExploder::ParticleExploder(size_t count, float range, float angle, sf::Color color, float life, float speed, sf::Vector2f pos) : ParticleSystem{ count, range, angle, color, life, speed }, isDone{ false } {
 	position = pos;
 	for (size_t i = 0; i < particles.size(); i++) {
 		resetParticle(i);
 	}
 }
 
-ParticleExploder::ParticleExploder(size_t count, float range, float angle, sf::Color color, float life, float speed, std::vector<ParticleExploder>* holdingVector, sf::Vector2f pos) : ParticleSystem{ count, range, angle, color, life, speed }, holdingVector{ holdingVector } {
+ParticleExploder::ParticleExploder(size_t count, float range, float angle, sf::Color color, float life, float speed, std::vector<std::unique_ptr<ParticleSystem>>* holdingVector, sf::Vector2f pos) : ParticleSystem{ count, range, angle, color, life, speed }, holdingVector{ holdingVector }, isDone{ false } {
 	position = pos;
 	for (size_t i = 0; i < particles.size(); i++) {
 		resetParticle(i);
@@ -16,11 +16,10 @@ ParticleExploder::ParticleExploder(size_t count, float range, float angle, sf::C
 
 void ParticleExploder::update(sf::Time elapsed) {
 	bool allUsed = true;
-	
 	for (size_t i = 0; i < particles.size(); i++) {
 		auto& p{ particles[i] };
 		p.lifetime -= elapsed;
-		p.velocity += acceleration;
+		p.velocity += acceleration * elapsed.asSeconds();
 
 		if (p.lifetime > sf::Time::Zero && allUsed) {
 			allUsed = false;
@@ -37,13 +36,21 @@ void ParticleExploder::update(sf::Time elapsed) {
 		}
 	}
 	
-	if (allUsed && holdingVector) {
-		for (size_t i = 0; i < holdingVector->size(); i++) {
-			auto& particleSystem = (*holdingVector)[i];
-			if (&particleSystem == this) {
-				holdingVector->erase(holdingVector->begin() + i);
-				break;
+	if (allUsed) {
+		if (holdingVector) {
+			for (size_t i = 0; i < holdingVector->size(); i++) {
+				auto& particleSystem = (*holdingVector)[i];
+				if (particleSystem.get() == this) {
+					holdingVector->erase(holdingVector->begin() + i);
+					break;
+				}
 			}
+		} else {
+			isDone = true;
 		}
 	}
+}
+
+bool ParticleExploder::getIsDone() {
+	return isDone;
 }
